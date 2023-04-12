@@ -8,7 +8,7 @@ $Cred = Get-Credential
 Connect-SPOService -Url $AdminSiteURL -credential $Cred
  
 #Loop through all user OneDrive sites and delete them
-for ($i = 1; $i -le 100; $i++) {
+for ($i = 1; $i -le 300; $i++) {
     if ($i -lt 10) {
         $username = $Prefix + "0$i"
     }
