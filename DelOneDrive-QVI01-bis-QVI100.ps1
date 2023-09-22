@@ -1,5 +1,5 @@
 $AdminSiteURL = "https://bbzolten-admin.sharepoint.com/"
-$Prefix = "qvo"
+$Prefix = "qvi"
  
 #Get Credentials to connect to SharePoint Admin Center
 $Cred = Get-Credential
