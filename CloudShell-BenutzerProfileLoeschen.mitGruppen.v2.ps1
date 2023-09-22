@@ -25,6 +25,7 @@ if (-not $ExcludeGroups -or $ExcludeGroups -ne "none") {
 | GIBS_2          | qvo151 | qvo175 |
 | GSBS_1          | qvo126 | qvo150 |
 | GSBS_2          | qvo176 | qvo200 |
+| QVI             | qvi01  | qvi100 |
 |-----------------|--------|--------|
 "@
 
@@ -52,6 +53,7 @@ $pruefungsgruppen = @{
     "GIBS_2"   = @{ "von" = 151; "bis" = 175 }
     "GSBS_1"   = @{ "von" = 126; "bis" = 150 }
     "GSBS_2"   = @{ "von" = 176; "bis" = 200 }
+    "QVI"      = @{ "von" = 01; "bis" = 100 }    
 }
 
 
@@ -84,14 +86,25 @@ foreach ($WVDHost in $VMHost) {
     Invoke-AZVMRunCommand -CommandId 'RunPowerShellScript' -VMName $WVDHost -ResourceGroupName $ResourceGroupNameVM -Parameter $pruefungsgruppen -ScriptString {
         # Define the list of accounts whose profiles must not be deleted
         $ExcludedUsers = "Public", "admin", "adminqvo", "administrator"
+
+        # Iterate through the ExcludeGroups
         foreach ($QVOGruppenname in $ExcludeGroups) {
-            for ($i = $pruefungsgruppen[$QVOGruppenname]["von"]; $i -le $pruefungsgruppen[$QVOGruppenname]["bis"]; $i++) {
-                $username = "qvo" + $i.ToString()
-                $ExcludedUsers += $username
+            # Check if the group exists in $pruefungsgruppen
+            if ($pruefungsgruppen.ContainsKey($QVOGruppenname)) {
+                for ($i = $pruefungsgruppen[$QVOGruppenname]["von"]; $i -le $pruefungsgruppen[$QVOGruppenname]["bis"]; $i++) {
+                    $username = "qvo" + $i.ToString()
+                    $ExcludedUsers += $username
+                }
+            }
+            elseif ($QVOGruppenname -eq "QVI") {
+                for ($i = $pruefungsgruppen["QVI"]["von"]; $i -le $pruefungsgruppen["QVI"]["bis"]; $i++) {
+                    $username = "qvi" + $i.ToString()
+                    $ExcludedUsers += $username
+                }
             }
         }
 
-        # Get a list of local profiles older than 2 days and not in use
+        # Get a list of local profiles older than 0 days and not in use
         $LocalProfiles = Get-WMIObject -class Win32_UserProfile | Where-Object { (!$_.Special) -and (!$_.Loaded) -and ($_.ConvertToDateTime($_.LastUseTime) -lt (Get-Date).AddDays(-0)) }
         
         # Loop through each local profile and delete it if it is not excluded
