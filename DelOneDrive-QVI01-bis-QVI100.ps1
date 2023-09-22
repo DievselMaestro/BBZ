@@ -2,10 +2,9 @@ $AdminSiteURL = "https://bbzolten-admin.sharepoint.com/"
 $Prefix = "qvi"
  
 #Get Credentials to connect to SharePoint Admin Center
-$Cred = Get-Credential
- 
+#$Cred = Get-Credential
 #Connect to SharePoint Online Admin Center
-Connect-SPOService -Url $AdminSiteURL -credential $Cred
+Connect-SPOService -Url $AdminSiteURL 
  
 #Loop through all user OneDrive sites and delete them
 for ($i = 1; $i -le 100; $i++) {
